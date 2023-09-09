@@ -3,6 +3,8 @@
 # Godot QOA Module
 A module to import and play QOA files, just like its MP3 and Ogg Vorbis counterparts.
 
+To use it, clone this repository into the engine source's `modules/` folder with the name `qoa` before building.
+
 QOA is an audio format with cheap decoding, intended to have dozens playing at the same time, with better quality and a similar decoding cost to IMA-ADPCM.
 
 ## What needs to be implemented?
