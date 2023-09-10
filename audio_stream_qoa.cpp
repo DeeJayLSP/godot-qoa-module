@@ -33,9 +33,8 @@ int AudioStreamPlaybackQOA::_mix_internal(AudioFrame *p_buffer, int p_frames) {
 		unsigned char *buffer = (unsigned char *)p_buffer;
 		short *sample_ptr = sample_data + (p_frames - todo) * qoad->channels;
 
-		// Always returning 0.
+		// Find a way to correctly provide parameters to qoa_decode_frame. Always returning 0 because frame doesn't match description.
 		unsigned int frame_size = qoa_decode_frame(buffer, qoa_max_frame_size(qoad), qoad, sample_ptr, &frame_len);
-		//printf("frame_size returned %d\n", frame_size);
 
 		if (frame_size) {
 			p_buffer[p_frames - todo] = AudioFrame(buffer[0], buffer[frame_size - 1]);
