@@ -6,6 +6,7 @@
 #define QOA_NO_STDIO
 
 #include <qoa.h>
+#include <qoaplay.c>
 
 int AudioStreamPlaybackQOA::_mix_internal(AudioFrame *p_buffer, int p_frames) {
 	if (!active) {
@@ -13,14 +14,7 @@ int AudioStreamPlaybackQOA::_mix_internal(AudioFrame *p_buffer, int p_frames) {
 	}
 
 	int todo = p_frames;
-	// TODO: find a way to decode QOA.
-	// The rest of this function doesn't decode anything.
-	// The following is just an attempt to mimic other formats' decoding, but prevents the engine from freezing on close.
-	
-	int total_samples = qoad->samples * qoad->channels;
-	short *sample_data = (short *)memalloc(total_samples * sizeof(short));
-	unsigned int frame_len;
-
+	int start_buffer = 0;
 	int frames_mixed_this_step = p_frames;
 
 	int beat_length_frames = -1;
@@ -30,28 +24,24 @@ int AudioStreamPlaybackQOA::_mix_internal(AudioFrame *p_buffer, int p_frames) {
 	}
 
 	while (todo && active) {
-		unsigned char *buffer = (unsigned char *)p_buffer;
-		short *sample_ptr = sample_data + (p_frames - todo) * qoad->channels;
+		float *buffer = (float *)p_buffer;
+		if (start_buffer > 0) {
+			buffer = (buffer + start_buffer * 2);
+		}
+		unsigned int num_samples = qoaplay_decode(qoad, buffer, todo);
 
-		// Find a way to correctly provide parameters to qoa_decode_frame. Always returning 0 because frame doesn't match description.
-		unsigned int frame_size = qoa_decode_frame(buffer, qoa_max_frame_size(qoad), qoad, sample_ptr, &frame_len);
-
-		if (frame_size) {
-			p_buffer[p_frames - todo] = AudioFrame(buffer[0], buffer[frame_size - 1]);
+		for (unsigned int num_samples_i = 0; num_samples_i < num_samples; num_samples_i++) {
 			if (loop_fade_remaining < FADE_SIZE) {
 				p_buffer[p_frames - todo] += loop_fade[loop_fade_remaining] * (float(FADE_SIZE - loop_fade_remaining) / float(FADE_SIZE));
 				loop_fade_remaining++;
 			}
-			todo -= frame_size;
+
+			--todo;
 			++frames_mixed;
 
 			if (beat_loop && (int)frames_mixed >= beat_length_frames) {
 				for (int i = 0; i < FADE_SIZE; i++) {
-					frame_size = qoa_decode_frame(buffer, qoa_max_frame_size(qoad), qoad, sample_ptr, &frame_len);
-					loop_fade[i] = AudioFrame(buffer[0], buffer[frame_size - 1]);
-					if (!frame_size) {
-						break;
-					}
+					p_buffer[i] = AudioFrame(buffer[i * qoa_stream->channels], buffer[i * qoa_stream->channels + qoa_stream->channels - 1]);
 				}
 				loop_fade_remaining = 0;
 				seek(qoa_stream->loop_offset);
@@ -59,11 +49,12 @@ int AudioStreamPlaybackQOA::_mix_internal(AudioFrame *p_buffer, int p_frames) {
 			}
 		}
 
-		else {
+		if (frames_mixed >= qoad->info.samples) {
 			//EOF
 			if (qoa_stream->loop) {
 				seek(qoa_stream->loop_offset);
 				loops++;
+				start_buffer = p_frames - todo;
 			} else {
 				frames_mixed_this_step = p_frames - todo;
 				//fill remainder with silence
@@ -116,7 +107,7 @@ void AudioStreamPlaybackQOA::seek(double p_time) {
 	}
 
 	frames_mixed = uint32_t(qoa_stream->sample_rate * p_time);
-	// TODO: implement seek, that is, if qoa even supports it
+	qoaplay_seek_frame(qoad, frames_mixed / QOA_FRAME_LEN);
 }
 
 void AudioStreamPlaybackQOA::tag_used_streams() {
@@ -125,9 +116,7 @@ void AudioStreamPlaybackQOA::tag_used_streams() {
 
 AudioStreamPlaybackQOA::~AudioStreamPlaybackQOA() {
 	if (qoad) {
-		// MAYBE_TODO: free qoad
-		// A clue from qoaplay.c is that it frees a struct containing the qoa_desc. So maybe memfree is enough.
-		memfree(qoad);
+		qoaplay_close(qoad);
 	}
 }
 
@@ -141,16 +130,14 @@ Ref<AudioStreamPlayback> AudioStreamQOA::instantiate_playback() {
 
 	qoas.instantiate();
 	qoas->qoa_stream = Ref<AudioStreamQOA>(this);
-	qoas->qoad = (qoa_desc *)memalloc(sizeof(qoa_desc));
-
-	unsigned int first_frame_pos = qoa_decode_header(data.ptr(), data.size(), qoas->qoad);
+	qoas->qoad = qoaplay_open_memory(data.ptr(), data.size());
 
 	qoas->frames_mixed = 0;
 	qoas->active = false;
 	qoas->loops = 0;
 
-	if (!first_frame_pos) {
-		ERR_FAIL_COND_V(!first_frame_pos, Ref<AudioStreamPlaybackQOA>());
+	if (!qoas->qoad) {
+		ERR_FAIL_COND_V(!qoas->qoad, Ref<AudioStreamPlaybackQOA>());
 	}
 
 	return qoas;
@@ -168,19 +155,14 @@ void AudioStreamQOA::set_data(const Vector<uint8_t> &p_data) {
 	int src_data_len = p_data.size();
 	const uint8_t *src_datar = p_data.ptr();
 
-	qoa_desc qoad;
-	unsigned int err = qoa_decode_header(src_datar, src_data_len, &qoad);
-	ERR_FAIL_COND_MSG(err != 8, "Failed to decode QOA file. Make sure it is a valid QOA audio file.");
+	qoaplay_desc *qoad = qoaplay_open_memory(src_datar, src_data_len);
+	ERR_FAIL_COND_MSG(qoad == nullptr, "Failed to decode QOA file. Make sure it is a valid QOA audio file.");
 
-	// Since channels, sample_rate and length are correctly read by Godot, this is assumed to be correct.
+	channels = qoad->info.channels;
+	sample_rate = qoad->info.samplerate;
+	length = float(qoad->info.samples) / (sample_rate);
 
-	channels = qoad.channels;
-	sample_rate = qoad.samplerate;
-	length = float(qoad.samples) / (sample_rate);
-
-	// MAYBE_TODO: find a way to close the qoad without crashing the engine (if necessary)
-	// A clue from qoaplay.c is that it frees the struct that contains the qoa_desc.
-
+	qoaplay_close(qoad);
 	clear_data();
 
 	data.resize(src_data_len);

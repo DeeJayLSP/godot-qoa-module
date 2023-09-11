@@ -17,7 +17,8 @@ class AudioStreamPlaybackQOA : public AudioStreamPlaybackResampled {
 	AudioFrame loop_fade[FADE_SIZE];
 	int loop_fade_remaining = FADE_SIZE;
 
-	qoa_desc *qoad = nullptr;
+	qoaplay_desc *qoad = nullptr;
+	int first_frame_pos = 0;
 	uint32_t frames_mixed = 0;
 	bool active = false;
 	int loops = 0;

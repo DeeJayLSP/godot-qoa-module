@@ -1,5 +1,3 @@
-**( ⚠ WARNING: This module is not completed yet. Don't expect it to work properly. More info on code comments. )**
-
 # Godot QOA Module
 A module to import and play QOA files, just like its MP3 and Ogg Vorbis counterparts.
 
@@ -7,9 +5,4 @@ To use it, clone this repository into the engine source's `modules/` folder with
 
 QOA is an audio format with cheap decoding, intended to have dozens playing at the same time, with better quality and a similar decoding cost to IMA-ADPCM.
 
-## What needs to be implemented?
-- [ ] Decoding and mixing;
-- [ ] Playback instancing;
-- [ ] Seeking;
-- [x] Reading channels, sample rate, and duration;
-- [x] Importing;
+This module uses the reference [qoa.h](https://github.com/phoboslab/qoa/blob/master/qoa.h) and borrows [qoaplay.c](https://github.com/raysan5/raudio/blob/master/src/external/qoaplay.c) from raudio, the only implementation with support for opening from memory. Both files contain some patches to remove what's not needed in this module;
