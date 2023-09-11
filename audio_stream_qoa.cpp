@@ -49,7 +49,7 @@ int AudioStreamPlaybackQOA::_mix_internal(AudioFrame *p_buffer, int p_frames) {
 			}
 		}
 
-		if (frames_mixed >= qoad->info.samples) {
+		if (frames_mixed >= qoad->info.samples - 64) {
 			//EOF
 			if (qoa_stream->loop) {
 				seek(qoa_stream->loop_offset);
