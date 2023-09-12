@@ -13,7 +13,7 @@ String ResourceImporterQOA::get_importer_name() const {
 }
 
 String ResourceImporterQOA::get_visible_name() const {
-    return "QOA";
+    return "Quite OK Audio";
 }
 
 void ResourceImporterQOA::get_recognized_extensions(List<String> *p_extensions) const {
