@@ -15,5 +15,5 @@ Both files above contain some patches to remove what's not needed in this module
 
 > All files are under the MIT license. Apart from thirdparty, the copyright statement in [LICENSE](https://github.com/DeeJayLSP/godot-qoa-module/blob/master/LICENSE) should be considered.
 
-### ⚠ Known issues
-- Playing mono audio files results in a distorted audio;
+### Notes
+- Only Mono and Stereo audio files are guaranteed to work;

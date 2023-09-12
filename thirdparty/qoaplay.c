@@ -239,7 +239,16 @@ unsigned int qoaplay_decode(qoaplay_desc *qoa_ctx, float *sample_data, int num_s
         // Normalize to -1..1 floats and write to dest
         for (int c = 0; c < qoa_ctx->info.channels; c++)
         {
-            sample_data[dst_index++] = qoa_ctx->sample_data[src_index++]/32768.0;
+            // GODOT-QOA-MODULE start
+            // Because Godot's AudioStream buffer system enforces stereo, we need to input each sample twice
+            if (qoa_ctx->info.channels == 1){
+                sample_data[dst_index++] = qoa_ctx->sample_data[src_index]/32768.0;
+                sample_data[dst_index++] = qoa_ctx->sample_data[src_index++]/32768.0;
+            }
+            else {
+                sample_data[dst_index++] = qoa_ctx->sample_data[src_index++]/32768.0;
+            }
+            // GODOT-QOA-MODULE end
         }
 
         qoa_ctx->sample_data_pos++;
