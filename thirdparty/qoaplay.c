@@ -69,7 +69,7 @@ extern "C" {            // Prevents name mangling of functions
 qoaplay_desc *qoaplay_open_memory(const unsigned char *data, int data_size);
 void qoaplay_close(qoaplay_desc *qoa_ctx);
 
-void qoaplay_rewind(qoaplay_desc *qoa_ctx);
+//void qoaplay_rewind(qoaplay_desc *qoa_ctx);
 void qoaplay_seek_frame(qoaplay_desc *qoa_ctx, int frame);
 unsigned int qoaplay_decode(qoaplay_desc *qoa_ctx, float *sample_data, int num_samples);
 unsigned int qoaplay_decode_frame(qoaplay_desc *qoa_ctx);
