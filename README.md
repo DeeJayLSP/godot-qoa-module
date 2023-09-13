@@ -1,3 +1,5 @@
+<img src="https://github.com/DeeJayLSP/godot-qoa-module/raw/master/editor/icons/AudioStreamQOA.svg" alt="AudioStreamQOA.svg" width=94/>
+
 # Godot QOA Module
 A module to import and play QOA files, just like its MP3 and Ogg Vorbis counterparts.
 
