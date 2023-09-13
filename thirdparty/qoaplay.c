@@ -65,7 +65,7 @@ typedef struct {
 extern "C" {            // Prevents name mangling of functions
 #endif
 
-qoaplay_desc *qoaplay_open(const char *path);
+// qoaplay_desc *qoaplay_open(const char *path);
 qoaplay_desc *qoaplay_open_memory(const unsigned char *data, int data_size);
 void qoaplay_close(qoaplay_desc *qoa_ctx);
 
@@ -151,7 +151,7 @@ qoaplay_desc *qoaplay_open_memory(const unsigned char *data, int data_size)
     qoaplay_desc *qoa_ctx = (qoaplay_desc *)QOA_MALLOC(sizeof(qoaplay_desc) + buffer_size + sample_data_size);
     memset(qoa_ctx, 0, sizeof(qoaplay_desc));
 
-    qoa_ctx->file = NULL;
+    // qoa_ctx->file = NULL;
 
     // Keep a copy of file data provided to be managed internally
     qoa_ctx->file_data = (unsigned char *)QOA_MALLOC(data_size);
@@ -174,7 +174,7 @@ qoaplay_desc *qoaplay_open_memory(const unsigned char *data, int data_size)
 // Close QOA file (if open) and free internal memory
 void qoaplay_close(qoaplay_desc *qoa_ctx)
 {
-    if (qoa_ctx->file) fclose(qoa_ctx->file);
+    // if (qoa_ctx->file) fclose(qoa_ctx->file);
 
     if ((qoa_ctx->file_data) && (qoa_ctx->file_data_size > 0))
     {
@@ -188,13 +188,15 @@ void qoaplay_close(qoaplay_desc *qoa_ctx)
 // Decode one frame from QOA data
 unsigned int qoaplay_decode_frame(qoaplay_desc *qoa_ctx)
 {
-    if (qoa_ctx->file) qoa_ctx->buffer_len = fread(qoa_ctx->buffer, 1, qoa_max_frame_size(&qoa_ctx->info), qoa_ctx->file);
+    // GODOT-QOA-MODULE start
+    /*if (qoa_ctx->file) qoa_ctx->buffer_len = fread(qoa_ctx->buffer, 1, qoa_max_frame_size(&qoa_ctx->info), qoa_ctx->file);
     else
-    {
+    {*/
         qoa_ctx->buffer_len = qoa_max_frame_size(&qoa_ctx->info);
         memcpy(qoa_ctx->buffer, qoa_ctx->file_data + qoa_ctx->file_data_offset, qoa_ctx->buffer_len);
         qoa_ctx->file_data_offset += qoa_ctx->buffer_len;
-    }
+    //}
+    // GODOT-QOA-MODULE end
 
     unsigned int frame_len;
     qoa_decode_frame(qoa_ctx->buffer, qoa_ctx->buffer_len, &qoa_ctx->info, qoa_ctx->sample_data, &frame_len);
@@ -205,15 +207,18 @@ unsigned int qoaplay_decode_frame(qoaplay_desc *qoa_ctx)
 }
 
 // Rewind QOA file or memory pointer to beginning
+/* GODOT-QOA-MODULE start
+// This function can be replaced by qoaplay_seek_frame with the frame parameter as 0
 void qoaplay_rewind(qoaplay_desc *qoa_ctx)
 {
     if (qoa_ctx->file) fseek(qoa_ctx->file, qoa_ctx->first_frame_pos, SEEK_SET);
-    else qoa_ctx->file_data_offset = 0;
+    qoa_ctx->file_data_offset = 0;
 
     qoa_ctx->sample_position = 0;
     qoa_ctx->sample_data_len = 0;
     qoa_ctx->sample_data_pos = 0;
 }
+*/
 
 // Decode required QOA frames
 unsigned int qoaplay_decode(qoaplay_desc *qoa_ctx, float *sample_data, int num_samples)
@@ -229,7 +234,9 @@ unsigned int qoaplay_decode(qoaplay_desc *qoa_ctx, float *sample_data, int num_s
             if (!qoaplay_decode_frame(qoa_ctx))
             {
                 // Loop to the beginning
-                qoaplay_rewind(qoa_ctx);
+                // GODOT-QOA-MODULE start
+                qoaplay_seek_frame(qoa_ctx, 0);
+                // GODOT-QOA-MODULE end
                 qoaplay_decode_frame(qoa_ctx);
             }
 
@@ -243,12 +250,9 @@ unsigned int qoaplay_decode(qoaplay_desc *qoa_ctx, float *sample_data, int num_s
             // Because Godot's AudioStream buffer system enforces stereo, we need to input each sample twice
             if (qoa_ctx->info.channels == 1){
                 sample_data[dst_index++] = qoa_ctx->sample_data[src_index]/32768.0;
-                sample_data[dst_index++] = qoa_ctx->sample_data[src_index++]/32768.0;
-            }
-            else {
-                sample_data[dst_index++] = qoa_ctx->sample_data[src_index++]/32768.0;
             }
             // GODOT-QOA-MODULE end
+            sample_data[dst_index++] = qoa_ctx->sample_data[src_index++]/32768.0;
         }
 
         qoa_ctx->sample_data_pos++;
@@ -293,6 +297,8 @@ void qoaplay_seek_frame(qoaplay_desc *qoa_ctx, int frame)
 
     unsigned int offset = qoa_ctx->first_frame_pos + frame*qoa_max_frame_size(&qoa_ctx->info);
 
-    if (qoa_ctx->file) fseek(qoa_ctx->file, offset, SEEK_SET);
-    else qoa_ctx->file_data_offset = offset;
+    // GODOT-QOA-MODULE start
+    //if (qoa_ctx->file) fseek(qoa_ctx->file, offset, SEEK_SET);
+    /*else*/ qoa_ctx->file_data_offset = offset;
+    // GODOT-QOA-MODULE end
 }

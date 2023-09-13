@@ -145,7 +145,7 @@ typedef struct {
 typedef struct {
     qoa_desc info;                  // QOA descriptor data
     
-    FILE *file;                     // QOA file to read, if NULL, using memory buffer -> file_data
+    // FILE *file;                     // QOA file to read, if NULL, using memory buffer -> file_data
     unsigned char *file_data;       // QOA file data on memory
     unsigned int file_data_size;    // QOA file data on memory size
     unsigned int file_data_offset;  // QOA file data on memory offset for next read
