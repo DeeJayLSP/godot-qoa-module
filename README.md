@@ -11,7 +11,7 @@ QOA is an audio format with cheap decoding, intended to have dozens playing at t
 ### Third-party
 These are the third-party files used in this module:
 - [qoa.h](https://github.com/phoboslab/qoa/blob/master/qoa.h) - The reference header;
-- [qoaplay.c](https://github.com/raysan5/raudio/blob/master/src/external/qoaplay.c) - A reference file with decoding functions modified for raudio to support opening from memory;
+- [qoaplay.c](https://github.com/raysan5/raudio/blob/master/src/external/qoaplay.c) - A reference file modified for raudio to support opening and decoding from memory, which is required by Godot;
 
 Both files above contain some patches to remove what's not needed in this module.
 
