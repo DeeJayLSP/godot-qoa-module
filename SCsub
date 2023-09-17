@@ -5,15 +5,5 @@ Import("env_modules")
 
 env_qoa = env_modules.Clone()
 
-thirdparty_dir = "./thirdparty/"
-
-# Treat qoa headers as system headers to avoid raising warnings. Not supported on MSVC.
-# Also use -fpermissive to avoid some errors in the qoa header.
-if not env.msvc:
-	env_qoa.Append(CPPFLAGS=["-fpermissive", "-isystem", Dir(thirdparty_dir).path])
-else:
-	env_qoa.Append(CPPFLAGS=["-fpermissive"])
-	env_qoa.Prepend(CPPPATH=[thirdparty_dir])
-
 # Godot source files
 env_qoa.add_source_files(env.modules_sources, "*.cpp")

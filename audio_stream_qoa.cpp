@@ -2,11 +2,10 @@
 
 #include "core/io/file_access.h"
 
-#define QOA_IMPLEMENTATION
-#define QOA_NO_STDIO
+#define DEQOA_IMPLEMENTATION
+#define DEQOA_ENFORCE_STEREO
 
-#include <qoa.h>
-#include <qoaplay.c>
+#include "./thirdparty/deqoa.h"
 
 int AudioStreamPlaybackQOA::_mix_internal(AudioFrame *p_buffer, int p_frames) {
 	if (!active) {
@@ -28,7 +27,7 @@ int AudioStreamPlaybackQOA::_mix_internal(AudioFrame *p_buffer, int p_frames) {
 		if (start_buffer > 0) {
 			buffer = (buffer + start_buffer * 2);
 		}
-		unsigned int num_samples = qoaplay_decode(qoad, buffer, todo);
+		unsigned int num_samples = deqoa_decode(qoad, buffer, todo);
 
 		for (unsigned int num_samples_i = 0; num_samples_i < num_samples; num_samples_i++) {
 			if (loop_fade_remaining < FADE_SIZE) {
@@ -107,7 +106,7 @@ void AudioStreamPlaybackQOA::seek(double p_time) {
 	}
 
 	frames_mixed = uint32_t(qoa_stream->sample_rate * p_time);
-	qoaplay_seek_frame(qoad, frames_mixed / QOA_FRAME_LEN);
+	deqoa_seek_frame(qoad, frames_mixed / QOA_FRAME_LEN);
 }
 
 void AudioStreamPlaybackQOA::tag_used_streams() {
@@ -116,7 +115,7 @@ void AudioStreamPlaybackQOA::tag_used_streams() {
 
 AudioStreamPlaybackQOA::~AudioStreamPlaybackQOA() {
 	if (qoad) {
-		qoaplay_close(qoad);
+		deqoa_close(qoad);
 	}
 }
 
@@ -130,7 +129,7 @@ Ref<AudioStreamPlayback> AudioStreamQOA::instantiate_playback() {
 
 	qoas.instantiate();
 	qoas->qoa_stream = Ref<AudioStreamQOA>(this);
-	qoas->qoad = qoaplay_open_memory(data.ptr(), data.size());
+	qoas->qoad = deqoa_open_memory(data.ptr(), data.size());
 
 	qoas->frames_mixed = 0;
 	qoas->active = false;
@@ -155,14 +154,14 @@ void AudioStreamQOA::set_data(const Vector<uint8_t> &p_data) {
 	int src_data_len = p_data.size();
 	const uint8_t *src_datar = p_data.ptr();
 
-	qoaplay_desc *qoad = qoaplay_open_memory(src_datar, src_data_len);
+	deqoa *qoad = deqoa_open_memory(src_datar, src_data_len);
 	ERR_FAIL_COND_MSG(qoad == nullptr, "Failed to decode QOA file. Make sure it is a valid QOA audio file.");
 
 	channels = qoad->info.channels;
 	sample_rate = qoad->info.samplerate;
 	length = float(qoad->info.samples) / (sample_rate);
 
-	qoaplay_close(qoad);
+	deqoa_close(qoad);
 	clear_data();
 
 	data.resize(src_data_len);
