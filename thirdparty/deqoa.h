@@ -93,7 +93,7 @@ deqoa *deqoa_open_memory(const unsigned char *data, int data_size);
 void deqoa_close(deqoa *qdc);
 
 void deqoa_seek_frame(deqoa *qdc, int frame);
-unsigned int deqoa_decode_stereo(deqoa *qdc, float *sample_data, int num_samples);
+unsigned int deqoa_decode(deqoa *qdc, float *sample_data, int num_samples);
 
 #ifdef __cplusplus
 }
