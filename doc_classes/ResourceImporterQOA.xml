@@ -4,8 +4,8 @@
 		Imports a QOA audio file for playback.
 	</brief_description>
 	<description>
-		QOA is a lossy audio format, with better audio quality compared to [ResourceImporterOggVorbis], [ResourceImporterMP3] and [ResourceImporterWAV] (when compressed as IMA-ADPCM).
-		It's recommended to use QOA when you need to play a lot of simultaneous sounds, but also save memory.
+		QOA is a lossy audio format, with quality compared to [ResourceImporterOggVorbis] and [ResourceImporterMP3] at a fair bit rate, but significantly better than [ResourceImporterWAV] at 8-bit or IMA-ADPCM compression.
+		It's recommended to use QOA when you need to play a lot of simultaneous sound effects, but also conserve memory that would otherwise be utilized by uncompressed audio formats.
 	</description>
 	<tutorials>
 		<link title="Importing audio samples">$DOCS_URL/tutorials/assets_pipeline/importing_audio_samples.html</link>
