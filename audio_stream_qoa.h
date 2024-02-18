@@ -4,7 +4,7 @@
 #include "core/io/resource_loader.h"
 #include "servers/audio/audio_stream.h"
 
-#include "./thirdparty/deqoa.h"
+#include "./thirdparty/qoa.h"
 
 class AudioStreamQOA;
 
@@ -17,7 +17,7 @@ class AudioStreamPlaybackQOA : public AudioStreamPlaybackResampled {
 	AudioFrame loop_fade[FADE_SIZE];
 	int loop_fade_remaining = FADE_SIZE;
 
-	deqoa *qoad = nullptr;
+	qoaplay_desc *qoad = nullptr;
 	uint32_t frames_mixed = 0;
 	bool active = false;
 	int loops = 0;

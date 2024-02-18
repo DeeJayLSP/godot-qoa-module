@@ -26,6 +26,7 @@ public:
 	virtual void show_advanced_options(const String &p_path) override;
 #endif
     static Ref<AudioStreamQOA> import_qoa(const String &p_path);
+	static Ref<AudioStreamQOA> import_wav(const String &p_path);
 
 	virtual Error import(const String &p_source_file, const String &p_save_path, const HashMap<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files = nullptr, Variant *r_metadata = nullptr) override;
 
