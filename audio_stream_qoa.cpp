@@ -154,7 +154,7 @@ void AudioStreamQOA::set_data(const Vector<uint8_t> &p_data) {
 	int src_data_len = p_data.size();
 	const uint8_t *src_datar = p_data.ptr();
 
-	qoaplay_desc *qoad = qoaplay_open_memory(src_datar, src_data_len);
+	qoaplay_desc *qoad = qoaplay_open(src_datar, src_data_len);
 	ERR_FAIL_COND_MSG(qoad == nullptr, "Failed to decode QOA file. Make sure it is a valid QOA audio file.");
 
 	channels = qoad->info.channels;

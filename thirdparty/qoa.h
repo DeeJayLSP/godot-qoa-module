@@ -1,4 +1,3 @@
-// A mix of qoa.h and qoaplay.c modified for Godot
 /*
 
 Copyright (c) 2023, Dominic Szablewski - https://phoboslab.org
@@ -141,12 +140,16 @@ typedef struct {
 	#endif
 } qoa_desc;
 
+// -- QOAPLAY start --
 typedef struct {
 	qoa_desc info;
 
+	// -- GODOT start --
+	//FILE *file;
 	unsigned char *file_data;
 	unsigned int file_data_size;
 	unsigned int file_data_offset;
+	// -- GODOT end --
 
 	unsigned int first_frame_pos;
 	unsigned int sample_pos;
@@ -159,21 +162,29 @@ typedef struct {
 	unsigned int sample_data_pos;
 
 } qoaplay_desc;
+// -- QOAPLAY end --
 
+// -- GODOT start --
 //unsigned int qoa_encode_header(qoa_desc *qoa, unsigned char *bytes);
 //unsigned int qoa_encode_frame(const short *sample_data, qoa_desc *qoa, unsigned int frame_len, unsigned char *bytes);
+// -- GODOT end --
 void *qoa_encode(const short *sample_data, qoa_desc *qoa, unsigned int *out_len);
 
+// -- GODOT start --
 //unsigned int qoa_max_frame_size(qoa_desc *qoa);
 //unsigned int qoa_decode_header(const unsigned char *bytes, int size, qoa_desc *qoa);
 //unsigned int qoa_decode_frame(const unsigned char *bytes, unsigned int size, qoa_desc *qoa, short *sample_data, unsigned int *frame_len);
 //short *qoa_decode(const unsigned char *bytes, int size, qoa_desc *file);
+// -- GODOT end --
 
-qoaplay_desc *qoaplay_open_memory(const unsigned char *data, int data_size);
+// -- QOAPLAY & GODOT start --
+qoaplay_desc *qoaplay_open(const unsigned char *data, int data_size);
+// -- GODOT end --
 void qoaplay_close(qoaplay_desc *qp);
 
 void qoaplay_seek_frame(qoaplay_desc *qp, int frame);
 unsigned int qoaplay_decode(qoaplay_desc *qp, float *sample_data, int num_samples);
+// -- QOAPLAY end --
 
 #ifndef QOA_NO_STDIO
 
@@ -181,6 +192,7 @@ int qoa_write(const char *filename, const short *sample_data, qoa_desc *qoa);
 void *qoa_read(const char *filename, qoa_desc *qoa);
 
 #endif /* QOA_NO_STDIO */
+
 
 #ifdef __cplusplus
 }
@@ -193,7 +205,9 @@ void *qoa_read(const char *filename, qoa_desc *qoa);
 
 #ifdef QOA_IMPLEMENTATION
 #include <stdlib.h>
+// -- GODOT start --
 #include <string.h>
+// -- GODOT end --
 
 #define QOA_F32_DIVISOR 32768.0f
 
@@ -371,13 +385,17 @@ static inline void qoa_write_u64(qoa_uint64_t v, unsigned char *bytes, unsigned 
 /* -----------------------------------------------------------------------------
 	Encoder */
 
+// -- GODOT start --
 static inline unsigned int qoa_encode_header(qoa_desc *qoa, unsigned char *bytes) {
+// -- GODOT end --
 	unsigned int p = 0;
 	qoa_write_u64(((qoa_uint64_t)QOA_MAGIC << 32) | qoa->samples, bytes, &p);
 	return p;
 }
 
+// -- GODOT start --
 static inline unsigned int qoa_encode_frame(const short *sample_data, qoa_desc *qoa, unsigned int frame_len, unsigned char *bytes) {
+// -- GODOT end --
 	unsigned int channels = qoa->channels;
 
 	unsigned int p = 0;
@@ -499,11 +517,13 @@ static inline unsigned int qoa_encode_frame(const short *sample_data, qoa_desc *
 			qoa_write_u64(best_slice, bytes, &p);
 		}
 	}
-	
+
 	return p;
 }
 
+// -- GODOT start --
 inline void *qoa_encode(const short *sample_data, qoa_desc *qoa, unsigned int *out_len) {
+// -- GODOT end --
 	if (
 		qoa->samples == 0 || 
 		qoa->samplerate == 0 || qoa->samplerate > 0xffffff ||
@@ -520,7 +540,9 @@ inline void *qoa_encode(const short *sample_data, qoa_desc *qoa, unsigned int *o
 		num_frames * QOA_LMS_LEN * 4 * qoa->channels + /* 4 * 4 bytes lms state per channel */
 		num_slices * 8 * qoa->channels;                /* 8 byte slices */
 
+	// -- GODOT start --
 	unsigned char *bytes = (unsigned char *)QOA_MALLOC(encoded_size);
+	// -- GODOT end --
 
 	for (int c = 0; c < qoa->channels; c++) {
 		/* Set the initial LMS weights to {0, 0, -1, 2}. This helps with the 
@@ -561,11 +583,15 @@ inline void *qoa_encode(const short *sample_data, qoa_desc *qoa, unsigned int *o
 /* -----------------------------------------------------------------------------
 	Decoder */
 
+// -- GODOT start --
 static inline unsigned int qoa_max_frame_size(qoa_desc *qoa) {
+// -- GODOT end --
 	return QOA_FRAME_SIZE(qoa->channels, QOA_SLICES_PER_FRAME);
 }
 
+// -- GODOT start --
 static inline unsigned int qoa_decode_header(const unsigned char *bytes, int size, qoa_desc *qoa) {
+// -- GODOT end --
 	unsigned int p = 0;
 	if (size < QOA_MIN_FILESIZE) {
 		return 0;
@@ -598,7 +624,9 @@ static inline unsigned int qoa_decode_header(const unsigned char *bytes, int siz
 	return 8;
 }
 
+// -- GODOT start --
 static inline unsigned int qoa_decode_frame(const unsigned char *bytes, unsigned int size, qoa_desc *qoa, short *sample_data, unsigned int *frame_len) {
+// -- GODOT end --
 	unsigned int p = 0;
 	*frame_len = 0;
 
@@ -667,6 +695,7 @@ static inline unsigned int qoa_decode_frame(const unsigned char *bytes, unsigned
 	return p;
 }
 
+// -- GODOT start --
 // short *qoa_decode(const unsigned char *bytes, int size, qoa_desc *qoa) {
 // 	unsigned int p = qoa_decode_header(bytes, size, qoa);
 // 	if (!p) {
@@ -693,7 +722,7 @@ static inline unsigned int qoa_decode_frame(const unsigned char *bytes, unsigned
 // 	qoa->samples = sample_index;
 // 	return sample_data;
 // }
-
+// -- GODOT end --
 
 
 /* -----------------------------------------------------------------------------
@@ -716,7 +745,6 @@ int qoa_write(const char *filename, const short *sample_data, qoa_desc *qoa) {
 		fclose(f);
 		return 0;
 	}
-	printf("Encoded size was %u\n", size);
 
 	fwrite(encoded, 1, size, f);
 	fclose(f);
@@ -761,25 +789,51 @@ void *qoa_read(const char *filename, qoa_desc *qoa) {
 
 // -- QOAPLAY start --
 
-inline qoaplay_desc *qoaplay_open_memory(const unsigned char *data, int data_size) {
+// -- GODOT start --
+inline qoaplay_desc *qoaplay_open(const unsigned char *data, int data_size) {
+	//FILE *file = fopen(path, "rb");
+	//if (!file) {
+	//	return NULL;
+	//}
+	// -- GODOT end --
+
+	/* Read and decode the file header */
+
 	unsigned char header[QOA_MIN_FILESIZE];
+	// -- GODOT start --
+	//int read = fread(header, QOA_MIN_FILESIZE, 1, file);
+	//if (!read) {
+	//	return NULL;
+	//}
 	memcpy(header, data, QOA_MIN_FILESIZE);
+	// -- GODOT end --
 
 	qoa_desc qd;
 	unsigned int first_frame_pos = qoa_decode_header(header, QOA_MIN_FILESIZE, &qd);
 	if (!first_frame_pos)
 		return NULL;
 
+	// -- GODOT start --
+	//fseek(file, first_frame_pos, SEEK_SET);
+	// -- GODOT end --
+
+	/* Allocate one chunk of memory for the qoaplay_desc struct, the sample data
+	for one frame and a buffer to hold one frame of encoded data. */
+
 	unsigned int buffer_size = qoa_max_frame_size(&qd);
 	unsigned int sample_data_size = qd.channels * QOA_FRAME_LEN * sizeof(short) * 2;
+
 	qoaplay_desc *qp = (qoaplay_desc *)malloc(sizeof(qoaplay_desc) + buffer_size + sample_data_size);
 	memset(qp, 0, sizeof(qoaplay_desc));
 
+	// -- GODOT start --
 	qp->file_data = (unsigned char *)malloc(data_size);
 	memcpy(qp->file_data, data, data_size);
 	qp->file_data_size = data_size;
 	qp->file_data_offset = 0;
 	qp->first_frame_pos = first_frame_pos;
+	//qp->file = file;
+	// -- GODOT end --
 
 	qp->buffer = ((unsigned char *)qp) + sizeof(qoaplay_desc);
 	qp->sample_data = (short *)(((unsigned char *)qp) + sizeof(qoaplay_desc) + buffer_size);
@@ -791,35 +845,44 @@ inline qoaplay_desc *qoaplay_open_memory(const unsigned char *data, int data_siz
 	return qp;
 }
 
+// -- GODOT start --
 inline void qoaplay_close(qoaplay_desc *qp) {
+	//fclose(qp->file);
 	if((qp->file_data) && (qp->file_data_size > 0)) {
 		free(qp->file_data);
 		qp->file_data_size = 0;
 	}
+// -- GODOT end --
 	free(qp);
 }
 
+// -- GODOT start --
 inline unsigned int qoaplay_decode_frame(qoaplay_desc *qp) {
+	//qp->buffer_len = fread(qp->buffer, 1, qoa_max_frame_size(&qp->info), qp->file);
 	qp->buffer_len = qoa_max_frame_size(&qp->info);
 	memcpy(qp->buffer, qp->file_data + qp->file_data_offset, qp->buffer_len);
 	qp->file_data_offset += qp->buffer_len;
+// -- GODOT end --
 
 	unsigned int frame_len;
 	qoa_decode_frame(qp->buffer, qp->buffer_len, &qp->info, qp->sample_data, &frame_len);
 	qp->sample_data_pos = 0;
 	qp->sample_data_len = frame_len;
-
 	return frame_len;
 }
 
+// -- GODOT start --
 // void qoaplay_rewind(qoaplay_desc *qp) {
 // 	fseek(qp->file, qp->first_frame_pos, SEEK_SET);
 // 	qp->sample_pos = 0;
 // 	qp->sample_data_len = 0;
 // 	qp->sample_data_pos = 0;
 // }
+// -- GODOT end --
 
+// -- GODOT start --
 inline unsigned int qoaplay_decode(qoaplay_desc *qp, float *sample_data, int num_samples) {
+// -- GODOT end --
 	int src_index = qp->sample_data_pos * qp->info.channels;
 	int dst_index = 0;
 	for (int i = 0; i < num_samples; i++) {
@@ -828,20 +891,31 @@ inline unsigned int qoaplay_decode(qoaplay_desc *qp, float *sample_data, int num
 		if (qp->sample_data_len - qp->sample_data_pos == 0) {
 			if (!qoaplay_decode_frame(qp)) {
 				// Loop to the beginning
+				// -- GODOT start --
+				// qoaplay_rewind(qp);
 				qoaplay_seek_frame(qp, 0);
+				// -- GODOT end --
 				qoaplay_decode_frame(qp);
 			}
 			src_index = 0;
 		}
 
 		/* Normalize to -1..1 floats and write to dest */
-		// -- modified for Godot start --
+		// -- GODOT start --
+		// for (int c = 0; c < qp->info.channels; c++) {
+		// 	sample_data[dst_index++] = qp->sample_data[src_index++] / 32768.0;
+		// }
 		if (qp->info.channels == 1)
 			sample_data[dst_index++] = qp->sample_data[src_index] / QOA_F32_DIVISOR;
 		else
 			sample_data[dst_index++] = qp->sample_data[src_index++] / QOA_F32_DIVISOR;
 		sample_data[dst_index++] = qp->sample_data[src_index++] / QOA_F32_DIVISOR;
-		// -- modified for Godot end --
+
+		// In case a 3+ channel file manages to make its way here, discard everything but L and R
+		if (qp->info.channels > 2) {
+			src_index += qp->info.channels - 2;
+		}
+		// -- GODOT end --
 
 		qp->sample_data_pos++;
 		qp->sample_pos++;
@@ -849,6 +923,7 @@ inline unsigned int qoaplay_decode(qoaplay_desc *qp, float *sample_data, int num
 	return num_samples;
 }
 
+// -- GODOT start --
 // double qoaplay_get_duration(qoaplay_desc *qp) {
 // 	return (double)qp->info.samples / (double)qp->info.samplerate;
 // }
@@ -860,16 +935,30 @@ inline unsigned int qoaplay_decode(qoaplay_desc *qp, float *sample_data, int num
 // int qoaplay_get_frame(qoaplay_desc *qp) {
 // 	return qp->sample_pos / QOA_FRAME_LEN;
 // }
+// -- GODOT end --
 
+// -- GODOT start --
 inline void qoaplay_seek_frame(qoaplay_desc *qp, int frame) {
+	//if (frame < 0) {
+	//	frame = 0;
+	//}
+	//if (frame > qp->info.samples / QOA_FRAME_LEN) {
+	//	frame = qp->info.samples / QOA_FRAME_LEN;
+	//}
 	frame = qoa_clamp(frame, 0, qp->info.samples / QOA_FRAME_LEN);
+// -- GODOT end --
 
 	qp->sample_pos = frame * QOA_FRAME_LEN;
 	qp->sample_data_len = 0;
 	qp->sample_data_pos = 0;
 
 	unsigned int offset = qp->first_frame_pos + frame * qoa_max_frame_size(&qp->info);
+	// -- GODOT start --
+	//fseek(qp->file, offset, SEEK_SET);
 	qp->file_data_offset = offset;
+	// -- GODOT end --
 }
+
+// -- QOAPLAY end --
 
 #endif /* QOA_IMPLEMENTATION */
