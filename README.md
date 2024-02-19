@@ -1,18 +1,23 @@
-<img src="https://github.com/DeeJayLSP/godot-qoa-module/raw/master/editor/icons/AudioStreamQOA.svg" alt="AudioStreamQOA.svg" width=94/>
+<img src="https://github.com/DeeJayLSP/godot-qoa-module/raw/master/media/AudioStreamQOALogo.svg" alt="AudioStreamQOALogo.svg" width=94/>
 
-# Godot QOA Module
-A module to import and play QOA files, just like its MP3 and Ogg Vorbis counterparts.
+# Quite OK Audio for Godot
+[QOA](https://qoaformat.org/) is a lossy audio format with cheap decoding, designed to have dozens playing at the same time, with better quality and a similar decoding cost to IMA-ADPCM. This makes it an ideal format for sound effects.
 
 ### Usage
-Clone this repository into the engine source's `modules/` folder with the name `qoa` before building. Then use QOA files like you would with MP3 or Ogg.
+Clone this repository into the engine source's `modules/` folder with the name `qoa` before building.
 
-Or even better: click on a WAV file, change its Import As from Microsoft WAV to Quite OK Audio and reimport. The file will be QOA internally.
+This enables you to use QOA files in your project like you would with MP3 or Ogg.
 
-QOA is an audio format with cheap decoding, intended to have dozens playing at the same time, with better quality and a similar decoding cost to IMA-ADPCM.
+You can import WAV files as QOA:
+- Click on a WAV file at the FileSystem dock, then go to the Import dock;
+- On the Import As dropdown, where you see Microsoft WAV, choose Quite OK Audio;
+- Reimport. The audio file will be encoded as QOA internally and on exports.
+
+In both cases the audio will be imported as AudioStreamQOA.
 
 ### Third-party
-The [qoa.h](https://github.com/DeeJayLSP/blob/master/thirdparty/deqoa.h) file is actually a modified mix of the the following:
+The [qoa.h](https://github.com/DeeJayLSP/blob/master/thirdparty/qoa.h) file is actually a mix of the following:
 - [qoa.h](https://github.com/phoboslab/qoa/blob/master/qoa.h) - The reference header;
 - [qoaplay.c](https://github.com/phoboslab/qoa/blob/master/qoaplay.c) - The reference player, modified for Godot;
 
-> All files outside `thirdparty` are under the MIT license, under the copyright statement in [LICENSE](https://github.com/DeeJayLSP/godot-qoa-module/blob/master/LICENSE). The file in `thirdparty` has its license on it.
+> All files outside `thirdparty` are under the MIT license, under the copyright statement in [LICENSE](https://github.com/DeeJayLSP/godot-qoa-module/blob/master/LICENSE). The file in `thirdparty` has its own license on it.
