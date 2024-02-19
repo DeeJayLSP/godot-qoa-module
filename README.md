@@ -8,7 +8,7 @@ Clone this repository into the engine source's `modules/` folder with the name `
 
 This enables you to use QOA files in your project like you would with MP3 or Ogg.
 
-You can import WAV files as QOA:
+You may also import WAV files as QOA:
 - Click on a WAV file at the FileSystem dock, then go to the Import dock;
 - On the Import As dropdown, where you see Microsoft WAV, choose Quite OK Audio;
 - Reimport. The audio file will be encoded as QOA internally and on exports.
