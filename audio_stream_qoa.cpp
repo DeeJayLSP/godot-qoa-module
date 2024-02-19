@@ -129,7 +129,7 @@ Ref<AudioStreamPlayback> AudioStreamQOA::instantiate_playback() {
 
 	qoas.instantiate();
 	qoas->qoa_stream = Ref<AudioStreamQOA>(this);
-	qoas->qoad = qoaplay_open_memory(data.ptr(), data.size());
+	qoas->qoad = qoaplay_open(data.ptr(), data.size());
 
 	qoas->frames_mixed = 0;
 	qoas->active = false;
