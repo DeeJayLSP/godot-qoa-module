@@ -805,7 +805,7 @@ inline void qoaplay_close(qoaplay_desc *qp) {
 }
 
 // -- GODOT start --
-inline unsigned int qoaplay_decode_frame(qoaplay_desc *qp) {
+static inline unsigned int qoaplay_decode_frame(qoaplay_desc *qp) {
 	//qp->buffer_len = fread(qp->buffer, 1, qoa_max_frame_size(&qp->info), qp->file);
 	qp->buffer_len = qoa_max_frame_size(&qp->info);
 	memcpy(qp->buffer, qp->file_data + qp->file_data_offset, qp->buffer_len);

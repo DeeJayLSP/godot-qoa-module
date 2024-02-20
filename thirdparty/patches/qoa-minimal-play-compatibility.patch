@@ -1,5 +1,5 @@
 diff --git a/qoa.h b/qoa.h
-index aa8fb59434..edc90cf77a 100644
+index aa8fb59434..7efba45f5d 100644
 --- a/qoa.h
 +++ b/qoa.h
 @@ -140,14 +140,41 @@ typedef struct {
@@ -267,7 +267,7 @@ index aa8fb59434..edc90cf77a 100644
 +}
 +
 +// -- GODOT start --
-+inline unsigned int qoaplay_decode_frame(qoaplay_desc *qp) {
++static inline unsigned int qoaplay_decode_frame(qoaplay_desc *qp) {
 +	//qp->buffer_len = fread(qp->buffer, 1, qoa_max_frame_size(&qp->info), qp->file);
 +	qp->buffer_len = qoa_max_frame_size(&qp->info);
 +	memcpy(qp->buffer, qp->file_data + qp->file_data_offset, qp->buffer_len);
