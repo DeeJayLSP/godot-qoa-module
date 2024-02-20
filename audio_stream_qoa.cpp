@@ -1,11 +1,9 @@
-#include "audio_stream_qoa.h"
-
-#include "core/io/file_access.h"
-
 #define QOA_IMPLEMENTATION
 #define QOA_NO_STDIO
 
-#include "./thirdparty/qoa.h"
+#include "audio_stream_qoa.h"
+
+#include "core/io/file_access.h"
 
 int AudioStreamPlaybackQOA::_mix_internal(AudioFrame *p_buffer, int p_frames) {
 	if (!active) {
@@ -247,9 +245,6 @@ void AudioStreamQOA::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_bar_beats"), &AudioStreamQOA::get_bar_beats);
 
 	ADD_PROPERTY(PropertyInfo(Variant::PACKED_BYTE_ARRAY, "data", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR), "set_data", "get_data");
-	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "bpm", PROPERTY_HINT_RANGE, "0,400,0.01,or_greater"), "set_bpm", "get_bpm");
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "beat_count", PROPERTY_HINT_RANGE, "0,512,1,or_greater"), "set_beat_count", "get_beat_count");
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "bar_beats", PROPERTY_HINT_RANGE, "2,32,1,or_greater"), "set_bar_beats", "get_bar_beats");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "loop"), "set_loop", "has_loop");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "loop_offset"), "set_loop_offset", "get_loop_offset");
 }
