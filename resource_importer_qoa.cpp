@@ -262,15 +262,15 @@ Ref<AudioStreamQOA> ResourceImporterQOA::import_from_wav(const String &p_path) {
 	desc.samples = frames;
 	desc.channels = format_channels;
 
-	uint32_t size;
-	void *encoded = qoa_encode((short *)wav_data.ptrw(), &desc, &size);
+	uint32_t dst_size;
+	void *encoded = qoa_encode((short *)wav_data.ptrw(), &desc, &dst_size);
 
 	Ref<AudioStreamQOA> qoa_stream;
 	qoa_stream.instantiate();
 
 	Vector<uint8_t> dst_data;
-	dst_data.resize(size);
-	memcpy(dst_data.ptrw(), encoded, size);
+	dst_data.resize(dst_size);
+	memcpy(dst_data.ptrw(), encoded, dst_size);
 
 	qoa_stream->set_data(dst_data);
 
