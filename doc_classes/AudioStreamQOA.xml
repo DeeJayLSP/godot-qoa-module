@@ -4,7 +4,7 @@
 		QOA audio stream driver.
 	</brief_description>
 	<description>
-		QOA audio stream driver. See [member data] if you want to load an QOA file at run-time.
+		QOA audio stream driver. See [member data] if you want to load a QOA file at run-time.
 	</description>
 	<tutorials>
 	</tutorials>
