@@ -5,7 +5,7 @@ Import("env_modules")
 
 env_qoa = env_modules.Clone()
 
-thirdparty_dir = "./thirdparty"
+thirdparty_dir = "./thirdparty/"
 
 # Treat qoa.h as system header to avoid raising warnings. Not supported on MSVC.
 if not env.msvc:

@@ -4,7 +4,7 @@
 #include "core/io/resource_loader.h"
 #include "servers/audio/audio_stream.h"
 
-#include "./thirdparty/qoa.h"
+#include <qoa.h>
 
 class AudioStreamQOA;
 

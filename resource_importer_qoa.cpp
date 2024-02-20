@@ -114,13 +114,13 @@ Ref<AudioStreamQOA> ResourceImporterQOA::import_from_wav(const String &p_path) {
 		ERR_FAIL_V_MSG(Ref<AudioStreamQOA>(), vformat("Not a WAV file. Header should contain 'WAVE', but found '%s', in file of size %d bytes", wave, file->get_length()));
 	}
 
-	uint32_t frames = 0;
+	int format_bits = 0;
+	int format_channels = 0;
 	bool format_found = false;
 	bool data_found = false;
-	uint32_t compression_code = 0;
-	uint32_t format_channels = 0;
-	uint32_t format_freq = 0;
-	uint32_t format_bits = 0;
+	int compression_code = 0;
+	int format_freq = 0;
+	int frames = 0;
 
 	Vector<float> data;
 
