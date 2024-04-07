@@ -4,22 +4,23 @@
 #include "core/io/resource_loader.h"
 #include "servers/audio/audio_stream.h"
 
-#include <qoa.h>
+#include "./thirdparty/qoa.h"
 
 class AudioStreamQOA;
 
 class AudioStreamPlaybackQOA : public AudioStreamPlaybackResampled {
 	GDCLASS(AudioStreamPlaybackQOA, AudioStreamPlaybackResampled);
 
-	enum {
-		FADE_SIZE = 256
-	};
-	AudioFrame loop_fade[FADE_SIZE];
-	int loop_fade_remaining = FADE_SIZE;
-
-	qoaplay_desc *qoad = nullptr;
+	qoa_desc *qoad = nullptr;
+	uint32_t data_offset = 0;
 	uint32_t frames_mixed = 0;
+	uint32_t frame_data_len = 0;
+	int16_t *decoded = nullptr;
+	uint32_t decoded_len = 0;
+	uint32_t decoded_offset = 0;
+
 	bool active = false;
+	int sign = 1;
 	int loops = 0;
 
 	friend class AudioStreamQOA;
@@ -51,40 +52,45 @@ class AudioStreamQOA : public AudioStream {
 	OBJ_SAVE_TYPE(AudioStream) //children are all saved as AudioStream, so they can be exchanged
 	RES_BASE_EXTENSION("qoastr");
 
+public:
+	// Keep the ResourceImporterQOA `edit/loop_mode` enum hint in sync with these options.
+	enum LoopMode {
+		LOOP_DISABLED,
+		LOOP_FORWARD,
+		LOOP_PINGPONG,
+		LOOP_BACKWARD,
+	};
+
+
+private:
 	friend class AudioStreamPlaybackQOA;
 
 	PackedByteArray data;
 	uint32_t data_len = 0;
 
-	float sample_rate = 1.0;
+	LoopMode loop_mode = LOOP_DISABLED;
 	int channels = 1;
 	float length = 0.0;
-	bool loop = false;
-	float loop_offset = 0.0;
+	int loop_begin = 0;
+	int loop_end = -1;
+	int mix_rate = 44100;
 	void clear_data();
-
-	double bpm = 0;
-	int beat_count = 0;
-	int bar_beats = 4;
 
 protected:
 	static void _bind_methods();
 
 public:
-	void set_loop(bool p_enable);
-	virtual bool has_loop() const override;
+	void set_loop_mode(LoopMode p_loop_mode);
+	LoopMode get_loop_mode() const;
 
-	void set_loop_offset(double p_seconds);
-	double get_loop_offset() const;
+	void set_loop_begin(int p_frame);
+	int get_loop_begin() const;
 
-	void set_bpm(double p_bpm);
-	virtual double get_bpm() const override;
+	void set_loop_end(int p_frame);
+	int get_loop_end() const;
 
-	void set_beat_count(int p_beat_count);
-	virtual int get_beat_count() const override;
-
-	void set_bar_beats(int p_bar_beats);
-	virtual int get_bar_beats() const override;
+	void set_mix_rate(int p_hz);
+	int get_mix_rate() const;
 
 	virtual Ref<AudioStreamPlayback> instantiate_playback() override;
 	virtual String get_stream_name() const override;
@@ -99,5 +105,7 @@ public:
 	AudioStreamQOA();
 	virtual ~AudioStreamQOA();
 };
+
+VARIANT_ENUM_CAST(AudioStreamQOA::LoopMode)
 
 #endif // AUDIO_STREAM_QOA_H

@@ -3,19 +3,35 @@
 # Quite OK Audio for Godot
 [QOA](https://qoaformat.org/) is a lossy audio format with cheap decoding, designed to have dozens playing at the same time, with better quality and a similar decoding cost to IMA-ADPCM. This makes it an ideal format for sound effects.
 
-### Usage
-Clone this repository into the engine source's `modules/` folder with the name `qoa` before building.
+## Usage
 
-This enables you to use QOA files in your project like you would with MP3 or Ogg.
+This module enables you to use the QOA format in your project.
 
-You may also import WAV files as QOA:
+Importing follows two approaches:
+
+### QOA files
+Drop a QOA file into your project's folder and it will be imported as is.
+
+### WAV files
 - Click on a WAV file at the FileSystem dock, then go to the Import dock;
-- On the Import As dropdown, where you see Microsoft WAV, choose Quite OK Audio;
-- Reimport. The audio file will be encoded as QOA internally and on exports.
+- On the Import As dropdown, where you see Microsoft WAV, choose Quite OK Audio.
+- The import options are more or less the same as Microsoft WAV and will be carried over automatically if imported before;
+- Reimport. The audio file will be encoded as QOA internally.
 
-In both cases the audio will be imported as AudioStreamQOA.
+In both cases the audio will be imported as an AudioStreamQOA resource.
 
-### Third-party
+## Building
+
+Clone the repository into `modules/`. Make sure the folder is named `qoa`;
+
+Before building, make sure to apply a patch to enable audio previews for QOA in the inspector. Run this command at the root of the engine's source:
+```bash
+git apply ./modules/qoa/inspector_audio_preview.patch
+```
+
+Finally, build the engine as usual.
+
+## Third-party
 The [qoa.h](https://github.com/DeeJayLSP/blob/master/thirdparty/qoa.h) file is actually a mix of the following:
 - [qoa.h](https://github.com/phoboslab/qoa/blob/master/qoa.h) - The reference header;
 - [qoaplay.c](https://github.com/phoboslab/qoa/blob/master/qoaplay.c) - The reference player, modified for Godot;

@@ -1,0 +1,27 @@
+diff --git a/editor/plugins/audio_stream_editor_plugin.cpp b/editor/plugins/audio_stream_editor_plugin.cpp
+index 2be9528019..38ff6a69e1 100644
+--- a/editor/plugins/audio_stream_editor_plugin.cpp
++++ b/editor/plugins/audio_stream_editor_plugin.cpp
+@@ -36,6 +36,10 @@
+ #include "editor/editor_string_names.h"
+ #include "scene/resources/audio_stream_wav.h"
+ 
++#include "modules/modules_enabled.gen.h"
++#ifdef MODULE_QOA_ENABLED
++#include "modules/qoa/audio_stream_qoa.h"
++#endif
+ // AudioStreamEditor
+ 
+ void AudioStreamEditor::_notification(int p_what) {
+@@ -266,7 +270,11 @@ AudioStreamEditor::AudioStreamEditor() {
+ // EditorInspectorPluginAudioStream
+ 
+ bool EditorInspectorPluginAudioStream::can_handle(Object *p_object) {
++#ifdef MODULE_QOA_ENABLED
++	return Object::cast_to<AudioStreamQOA>(p_object) != nullptr || Object::cast_to<AudioStreamWAV>(p_object) != nullptr;
++#else
+ 	return Object::cast_to<AudioStreamWAV>(p_object) != nullptr;
++#endif
+ }
+ 
+ void EditorInspectorPluginAudioStream::parse_begin(Object *p_object) {

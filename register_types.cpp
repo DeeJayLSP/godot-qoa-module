@@ -20,10 +20,17 @@ void initialize_qoa_module(ModuleInitializationLevel p_level) {
 		ResourceFormatImporter::get_singleton()->add_importer(qoa_import);
 	}
 
-#if VERSION_MAJOR >= 4 && VERSION_MINOR >= 2
+#if VERSION_MAJOR >= 4
+#if VERSION_MINOR >= 3
+	ClassDB::APIType prev_api = ClassDB::get_current_api();
+	ClassDB::set_current_api(ClassDB::API_EDITOR);
+#if VERSION_MINOR >= 2
 	// Required to document import options in the class reference.
 	GDREGISTER_CLASS(ResourceImporterQOA);
-#endif
+#endif // VERSION_MINOR >= 2
+	ClassDB::set_current_api(prev_api);
+#endif // VERSION_MINOR >= 3
+#endif // VERSION_MAJOR >= 4
 #endif // TOOLS_ENABLED
 
 	GDREGISTER_CLASS(AudioStreamQOA);
