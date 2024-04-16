@@ -4,17 +4,11 @@
 		QOA audio stream driver.
 	</brief_description>
 	<description>
-		QOA audio stream driver. See [member data] if you want to load a QOA file at run-time.
+		[url=https://qoaformat.org/]QOA[/url] audio stream driver. See [member data] if you want to load a QOA file at run-time.
 	</description>
 	<tutorials>
 	</tutorials>
 	<members>
-		<member name="bar_beats" type="int" setter="set_bar_beats" getter="get_bar_beats" default="4">
-		</member>
-		<member name="beat_count" type="int" setter="set_beat_count" getter="get_beat_count" default="0">
-		</member>
-		<member name="bpm" type="float" setter="set_bpm" getter="get_bpm" default="0.0">
-		</member>
 		<member name="data" type="PackedByteArray" setter="set_data" getter="get_data" default="PackedByteArray()">
 			Contains the audio data in bytes.
 			You can load a file without having to import it beforehand using the code snippet below. Keep in mind that this snippet loads the whole file into memory and may not be ideal for huge files (hundreds of megabytes or more).
@@ -37,11 +31,36 @@
 			[/csharp]
 			[/codeblocks]
 		</member>
-		<member name="loop" type="bool" setter="set_loop" getter="has_loop" default="false">
-			If [code]true[/code], the stream will automatically loop when it reaches the end.
+		<member name="loop_begin" type="int" setter="set_loop_begin" getter="get_loop_begin" default="0">
+			The loop start point (in number of samples, relative to the beginning of the sample). If imported from a WAV file, this information will be read automatically if present.
 		</member>
-		<member name="loop_offset" type="float" setter="set_loop_offset" getter="get_loop_offset" default="0.0">
-			Time in seconds at which the stream starts after being looped.
+		<member name="loop_end" type="int" setter="set_loop_end" getter="get_loop_end" default="-1">
+			The loop end point (in number of samples, relative to the beginning of the sample). If imported from a WAV file, this information will be read automatically if present.
+		</member>
+		<member name="loop_mode" type="int" setter="set_loop_mode" getter="get_loop_mode" enum="AudioStreamQOA.LoopMode" default="0">
+			The loop mode. If imported from a WAV file, this information will be read automatically. See [enum LoopMode] constants for values.
+		</member>
+		<member name="mix_rate" type="int" setter="set_mix_rate" getter="get_mix_rate" default="44100">
+			The sample rate for mixing this audio. Higher values require more storage space, but result in better quality.
+			In games, common sample rates in use are [code]11025[/code], [code]16000[/code], [code]22050[/code], [code]32000[/code], [code]44100[/code], and [code]48000[/code].
+			According to the [url=https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem]Nyquist-Shannon sampling theorem[/url], there is no quality difference to human hearing when going past 40,000 Hz (since most humans can only hear up to ~20,000 Hz, often less). If you are using lower-pitched sounds such as voices, lower sample rates such as [code]32000[/code] or [code]22050[/code] may be usable with no loss in quality.
+		</member>
+		<member name="stereo" type="bool" setter="set_stereo" getter="is_stereo" default="false">
+			If [code]true[/code], audio is stereo.
 		</member>
 	</members>
+	<constants>
+		<constant name="LOOP_DISABLED" value="0" enum="LoopMode">
+			Audio does not loop.
+		</constant>
+		<constant name="LOOP_FORWARD" value="1" enum="LoopMode">
+			Audio loops the data between [member loop_begin] and [member loop_end], playing forward only.
+		</constant>
+		<constant name="LOOP_PINGPONG" value="2" enum="LoopMode">
+			Audio loops the data between [member loop_begin] and [member loop_end], playing back and forth.
+		</constant>
+		<constant name="LOOP_BACKWARD" value="3" enum="LoopMode">
+			Audio loops the data between [member loop_begin] and [member loop_end], playing backward only.
+		</constant>
+	</constants>
 </class>
