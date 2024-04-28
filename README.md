@@ -32,8 +32,6 @@ git apply ./modules/qoa/inspector_audio_preview.patch
 Finally, build the engine as usual.
 
 ## Third-party
-The [qoa.h](https://github.com/DeeJayLSP/blob/master/thirdparty/qoa.h) file is actually a mix of the following:
-- [qoa.h](https://github.com/phoboslab/qoa/blob/master/qoa.h) - The reference header;
-- [qoaplay.c](https://github.com/phoboslab/qoa/blob/master/qoaplay.c) - The reference player, modified for Godot;
+- [qoa.h](https://github.com/phoboslab/qoa/blob/master/qoa.h) - The reference header with some patches;
 
 > All files outside `thirdparty` are under the MIT license, under the copyright statement in [LICENSE](https://github.com/DeeJayLSP/godot-qoa-module/blob/master/LICENSE). The file in `thirdparty` has its own license on it.
