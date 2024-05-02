@@ -1,3 +1,5 @@
+## PSA: QOA has been added to Godot 4.3 as a compression mode for WAVs. This module now serves the purpose of providing it for previous versions.
+
 <img src="https://github.com/DeeJayLSP/godot-qoa-module/raw/master/media/AudioStreamQOALogo.svg" alt="AudioStreamQOALogo.svg" width=94/>
 
 # Quite OK Audio for Godot
